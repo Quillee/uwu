@@ -13,12 +13,12 @@
             "state": {
               "type": "markdown",
               "state": {
-                "file": "uwu/m0-spike/prd-m0-spike.md",
+                "file": "uwu/m0-spike/04.03-guard-decision-logic.md",
                 "mode": "source",
                 "source": false
               },
               "icon": "lucide-file",
-              "title": "prd-m0-spike"
+              "title": "04.03-guard-decision-logic"
             }
           }
         ]
@@ -184,6 +184,12 @@
   },
   "active": "e50f37b3b6051a56",
   "lastOpenFiles": [
+    "uwu/m0-spike/prd-m0-spike.md",
+    "uwu/m0-spike/11.10-wails-event-bridge.md",
+    "uwu/m0-spike/09.06.08-bash-probe-experiments.md",
+    "uwu/m0-spike/08.07-headless-driver-core.md",
+    "uwu/m0-spike/05.04-hook-endpoint-and-protocol.md",
+    "uwu/m0-spike/04.03-guard-decision-logic.md",
     "uwu/ROADMAP.md"
   ]
 }

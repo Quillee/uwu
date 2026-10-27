@@ -20,15 +20,15 @@ tags:
 # M0: Spike
 
 > [!info] Next up
-> After Claude's scaffolding: [[uwu/m0-spike/04.03-guard-decision-logic|04 Guard decision logic]], step 1. Owner: you.
+> [[uwu/m0-spike/04.03-guard-decision-logic|04 Guard decision logic]], step 1. Owner: you. Stub and red tests ready: `go test ./internal/guard/` from `spike/`.
 
 ## Tasks
 
 | # | Task | Owner | Depends on | Status | Walkthrough | Notes |
 |---|------|-------|------------|--------|-------------|-------|
-| 01 | Toolchain setup | claude | none | not-started | n/a | Install Wails CLI; Go and pnpm already present. Ask before system-wide installs. |
-| 02 | Wails v2 vs v3 decision | claude | 01 | not-started | n/a | Rule: v2 unless v3 has a stable release. Decision record in docs/decisions/. |
-| 03 | Spike scaffold | claude | 01, 02 | not-started | n/a | wails init in spike/, go module, fake target repo with guarded paths. All throwaway. |
+| 01 | Toolchain setup | claude | none | done | n/a | wails3 CLI v3.0.0-beta.34 in ~/go/bin (user-local; v2.17.0 `wails` also installed). Fixed broken corepack/pnpm (now 12.15.0). wails3 doctor: system ready. |
+| 02 | Wails v2 vs v3 decision | claude | 01 | done | n/a | v3, pinned v3.0.0-beta.34 — owner override of the v2-unless-stable rule (see Implementation Decisions). v2 record: docs/decisions/0001-wails-v2.md, needs superseding. |
+| 03 | Spike scaffold | claude | 01, 02 | done | n/a | spike/ (wails3 init -t react, `wails3 build` passes), faketarget/ fake repo (own git, guarded/+open/+calc/ with slow test), go.work for gopls. |
 | 04 | Guard decision logic | you | 03 | not-started | [[uwu/m0-spike/04.03-guard-decision-logic\|04 Guard decision logic]] | Pure Go: tool call + guarded set in, allow/deny with reason out. Table tests define done. |
 | 05 | Hook endpoint and protocol | you | 04 | not-started | [[uwu/m0-spike/05.04-hook-endpoint-and-protocol\|05 Hook endpoint and protocol]] | Local socket server, PreToolUse payload, deny-response shape. Protocol design survives to M1. |
 | 06 | Hook config wiring | claude | 05 | not-started | n/a | Claude Code hook settings for the spawned session, pointing at the endpoint. |
@@ -101,7 +101,7 @@ Decisions from the grill (2026-10-25):
 - **Spike fate: throwaway.** The spike is isolated from the future real codebase and deleted in task 13. Only decision records and session fixtures survive. M1 starts fresh.
 - **Hook pass bar:** pass = the hook deterministically blocks Edit/Write on guarded paths with a denial reason the agent can read, across repeated runs. The Bash hole (writes via `echo`, `sed`, scripts) is deliberately probed and documented, not sealed. Fallback to the Go SDK triggers only if hook invocation itself is unreliable (not invoked, silent failure) — not on a Bash bypass, because the SDK has the same hole. Detect-and-revert (git diff on guarded paths after each turn) is noted as the likely M4 backstop layer.
 - **CLI vs SDK criterion:** hinges on hook invocation reliability plus whether stream-json output is drivable through gated phases. Both are exercised directly by this spike.
-- **Wails version rule:** v2 unless v3 has a stable (non-alpha/beta) release at spike time.
+- **Wails version:** v3, pinned to `v3.0.0-beta.34`. The grill's original rule ("v2 unless v3 has a stable release") selected v2.17.0; the owner overrode it on 2026-10-25, accepting beta risk to avoid a v2→v3 migration later. Pin exact tags and bump deliberately; v2.17.0 stays installed as the fallback.
 - **Definition of done:** all four PLAN.md exit criteria — Wails decided, headless gated driving with fixtures recorded, the hook test per the pass bar above, and a test run streamed into a real Wails event.
 - **Gated phases, concretely:** the driver must demonstrate at least one pause between phases where the Go side must approve before the session continues. This is the kernel of the stage gate.
 - **Guard shape:** the guard decision is a pure function (tool call + guarded path set in, allow/deny with reason out). The hook endpoint is a thin adapter over it: PreToolUse JSON in over a local socket, decision out.
@@ -123,7 +123,7 @@ Decisions from the grill (2026-10-25):
 
 ## Assumptions and Open Questions
 
-> [!question] Q1: Does `wails dev` expose a browser-reachable endpoint that Playwright can target?
+> [!question] Q1: Does `wails3 dev` expose a browser-reachable endpoint that Playwright can target?
 > PLAN.md §10 plans frontend flows against it. Verify as a side observation during task 11; it changes M2's testing story, not M0's outcome.
 
 > [!question] Q2: Local socket transport for the hook: unix domain socket or localhost HTTP?
@@ -153,3 +153,5 @@ Decisions from the grill (2026-10-25):
 - 2026-10-25: Created. Settings: grill=full, own=most, hints=graduated, stop=prd, level=familiar.
 - 2026-10-25: Grill complete (7 questions). Spike fate, hook pass bar, done criteria, PRD layout, test seams, and ownership calibration recorded above.
 - 2026-10-25: Owner split approved as proposed (you: 04, 05, 08, 09, 11; claude: the rest). Stopped at stop=prd.
+- 2026-10-25: Resumed. Tasks 01–03 done (Wails v2.17.0 per docs/decisions/0001-wails-v2.md; spike/ scaffolded and building; faketarget/ created; corepack/pnpm repaired). Walkthroughs generated for 04, 05, 08, 09, 11 (05/08/09/11 provisional). Stage 04 scaffolded: guard stub + red tests in spike/internal/guard/.
+- 2026-10-25: Owner switched Wails to v3 (v3.0.0-beta.34), overriding the v2-unless-stable rule. spike/ re-scaffolded with `wails3 init -t react` (guard stub, tests, faketarget preserved); `wails3 build` passes; guard tests still red on TODO(you). Walkthrough 11 regenerated for v3 APIs; 04 and 05 context lines updated. Decision record for v3 not yet written (0001 still says v2).
